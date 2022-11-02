@@ -15,7 +15,7 @@ endif
 
 $(objects):
 
-%.d: %.c sub-x86_soft
+%.d: %.c
 	@set -e; rm -f $@; \
 	$(CC) -MM $(CFLAGS) $< > $@.$$$$; \
 	sed 's,\($*\)\.o[ :]*,\1.o $@ : ,g' < $@.$$$$ > $@; \
@@ -24,9 +24,6 @@ $(objects):
 # %.o: myunp.h
 %.o: %.c
 	$(CC) $(CFLAGS) -o $@ -c $<
-
-sub-%:
-	echo "$*"
 
 clean:
 	-rm -f *.o; \
