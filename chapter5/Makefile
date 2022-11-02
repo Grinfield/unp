@@ -1,29 +1,30 @@
 CC = gcc
-CFLAGS = -g -O0 -I../include
-objects = tcpserver01.o wraps.o
+
+sub_objs = tcpserver01.o
+all_objs :=
+all_objs += $(sub_objs) 
+all_objs += $(BUILD_DIR)/$(COMMON_OBJS)
 
 .PHONY: all clean
 
 all: tcpserver01
 
-tcpserver01: tcpserver01.o wraps.o
-	$(CC) $(CFLAGS) -o $@ $^
+tcpserver01: $(all_objs)
+	$(CC) $(SUBDIR_CFLAGS) -o $@ $^
 
 ifneq ($(MAKECMDGOALS),clean)
--include $(objects:.o=.d)
+-include $(sub_objs:.o=.d)
 endif
-
-$(objects):
 
 %.d: %.c
 	@set -e; rm -f $@; \
-	$(CC) -MM $(CFLAGS) $< > $@.$$$$; \
+	$(CC) -MM $(SUBDIR_CFLAGS) $< > $@.$$$$; \
 	sed 's,\($*\)\.o[ :]*,\1.o $@ : ,g' < $@.$$$$ > $@; \
 	rm -f $@.$$$$
 
 # %.o: myunp.h
 %.o: %.c
-	$(CC) $(CFLAGS) -o $@ -c $<
+	$(CC) $(SUBDIR_CFLAGS) -o $@ -c $<
 
 clean:
 	-rm -f *.o; \
