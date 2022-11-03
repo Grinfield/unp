@@ -1,23 +1,24 @@
 CC = gcc
 CFLAGS = -g -O0
-BUILD_DIR = $(CURDIR)
+SRC_DIR = $(CURDIR)
 
-CFLAGS += -I$(BUILD_DIR)/include
+CFLAGS += -I$(SRC_DIR)/include
 
 SUBDIR_CFLAGS = -g -O0 
-SUBDIR_CFLAGS += -I$(BUILD_DIR)/include
+SUBDIR_CFLAGS += -I$(SRC_DIR)/include
 
 TARGET_DIRS = chapter5
 SUBDIR_RULES = $(patsubst %,subdir-%, $(TARGET_DIRS))
 
-common_objs := common/wraps.o
+COMMON_OBJS := common/wraps.o
+LIBS :=
 
 .PHONY: all clean
 
 all: $(SUBDIR_RULES)
 
 ifneq ($(MAKECMDGOALS),clean)
--include $(common_objs:.o=.d)
+-include $(COMMON_OBJS:.o=.d)
 endif
 
 %.d: %.c
@@ -29,14 +30,14 @@ endif
 %.o: %.c
 	$(CC) $(CFLAGS) -o $@ -c $<
 
-$(common_objs):
+$(COMMON_OBJS):
 
-subdir-%: $(common_objs)
-	$(MAKE) -C $* SUBDIR_CFLAGS="$(SUBDIR_CFLAGS)" COMMON_OBJS="$(common_objs)" BUILD_DIR=$(BUILD_DIR) all
+subdir-%: $(COMMON_OBJS)
+	$(MAKE) -C $* SUBDIR_CFLAGS="$(SUBDIR_CFLAGS)" COMMON_OBJS="$(COMMON_OBJS)" SRC_DIR=$(SRC_DIR) all
 
 clean:
-	-rm -f common/*.o; \
-	rm -f common/*.d; \
+	-$(RM) common/*.o; \
+	$(RM) common/*.d; \
 	for d in $(TARGET_DIRS); do \
 	if test -d $$d; then $(MAKE) -C $$d $@ || exit 1; fi; \
         done

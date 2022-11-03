@@ -1,9 +1,9 @@
 CC = gcc
 
-sub_objs = tcpserver01.o
+sub_objs := tcpserver01.o
 all_objs :=
 all_objs += $(sub_objs) 
-all_objs += $(BUILD_DIR)/$(COMMON_OBJS)
+all_objs += $(SRC_DIR)/$(COMMON_OBJS)
 
 .PHONY: all clean
 
@@ -17,16 +17,15 @@ ifneq ($(MAKECMDGOALS),clean)
 endif
 
 %.d: %.c
-	@set -e; rm -f $@; \
+	@set -e; $(RM) $@; \
 	$(CC) -MM $(SUBDIR_CFLAGS) $< > $@.$$$$; \
 	sed 's,\($*\)\.o[ :]*,\1.o $@ : ,g' < $@.$$$$ > $@; \
-	rm -f $@.$$$$
+	$(RM) $@.$$$$
 
-# %.o: myunp.h
 %.o: %.c
 	$(CC) $(SUBDIR_CFLAGS) -o $@ -c $<
 
 clean:
-	-rm -f *.o; \
-	rm -f *.d; \
-	rm -f tcpserver01;
+	-$(RM) *.o; \
+	$(RM) *.d; \
+	$(RM) tcpserver01;
