@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <arpa/inet.h>
 #include <netinet/in.h>
 #include <sys/socket.h>
 #include <sys/types.h>
@@ -19,14 +20,17 @@ int main(int argc, char *argv[])
 {
     int listenfd, connfd;
     int ret;
+    char str[INET_ADDRSTRLEN];
     pid_t childpid;
     socklen_t clilen;
     struct sockaddr_in cliaddr, servaddr;
+
     listenfd = socket(AF_INET, SOCK_STREAM, 0);
     if (listenfd < 0){
         perror("socket()");
         exit(1);
     }
+
     bzero(&servaddr, sizeof(servaddr));
     servaddr.sin_family = AF_INET;
     servaddr.sin_addr.s_addr = htonl(INADDR_ANY);
@@ -51,6 +55,9 @@ int main(int argc, char *argv[])
             perror("accept()");
             exit(1);
         }
+        printf("Accept client: %s at port: %d\n", 
+                inet_ntop(AF_INET, &cliaddr.sin_addr, str, sizeof(str)),
+                ntohs(cliaddr.sin_port));
 
         if ((childpid = fork()) == 0){
             close(listenfd);
