@@ -1,19 +1,22 @@
 CC = gcc
 
-sub_objs := tcpserver01.o
+sub_objs := tcpserver01.o tcpcli01.o
 all_objs :=
 all_objs += $(sub_objs) 
-all_objs += $(SRC_DIR)/$(COMMON_OBJS)
+dep_objs += $(SRC_DIR)/$(COMMON_OBJS)
 
 .PHONY: all clean
 
-all: tcpserver01
+all: tcpserver01 tcpcli01
 
-tcpserver01: $(all_objs)
+tcpserver01: tcpserver01.o $(dep_objs)
+	$(CC) $(SUBDIR_CFLAGS) -o $@ $^
+
+tcpcli01: tcpcli01.o $(dep_objs)
 	$(CC) $(SUBDIR_CFLAGS) -o $@ $^
 
 ifneq ($(MAKECMDGOALS),clean)
--include $(sub_objs:.o=.d)
+-include $(all_objs:.o=.d)
 endif
 
 %.d: %.c
@@ -28,4 +31,5 @@ endif
 clean:
 	-$(RM) *.o; \
 	$(RM) *.d; \
-	$(RM) tcpserver01;
+	$(RM) tcpserver01; \
+	$(RM) tcpcli01;
