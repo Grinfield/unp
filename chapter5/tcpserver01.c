@@ -7,7 +7,7 @@
 #include <netinet/in.h>
 #include <sys/socket.h>
 #include <sys/types.h>
-#include <string.h>
+#include <strings.h>
 #include <errno.h>
 
 #include "myunp.h"

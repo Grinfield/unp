@@ -6,6 +6,7 @@
 #include <sys/types.h>
 #include <stdlib.h>
 #include <string.h>
+#include <strings.h>
 #include <arpa/inet.h>
 
 #define SRVPORT 8880
