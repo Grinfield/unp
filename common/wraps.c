@@ -14,28 +14,38 @@ void str_echo(int sockfd)
     char buf[BUFSIZ];
 
 again:
-    while ((n = read(sockfd, buf, BUFSIZ)) > 0) {
+    while ((n = read(sockfd, buf, BUFSIZ - 1)) > 0) {
+        buf[n] = '\0';
         printf("read %ld %s", n, buf);
-        write(sockfd, buf, n);
+        if(write(sockfd, buf, n) < 0){
+            perror("write()");
+            break;
+        }
     }
 
     if ( n < 0 && errno == EINTR)
         goto again;
-    else if (n < 0)
-        fprintf(stderr, "str_echo: read error");
+    else if (n < 0){
+        perror("read()");
+        fprintf(stderr, "str_echo: read error\n");
+    }
 }
 
+#if 0
 void str_cli(FILE *stream, int sock)
 {
     char sendline[BUFSIZ], recvline[BUFSIZ];
-    size_t len = 0;
+    ssize_t len = 0;
 
-    while(fgets(sendline, BUFSIZ, stream) != NULL){
-        write(sock, sendline, strlen(sendline));
+    while (fgets(sendline, BUFSIZ, stream) != NULL) {
+        if(write(sock, sendline, strlen(sendline)) < 0) {
+            perror("write()");
+            break;
+        }
 
         len = read(sock, recvline, BUFSIZ);
         if (len == 0) {
-            fprintf(stderr, "str_cli: server terminated prematurely");
+            fprintf(stderr, "str_cli: server terminated prematurely\n");
             break;
         } else if (len < 0) {
             perror("read()");
@@ -44,3 +54,4 @@ void str_cli(FILE *stream, int sock)
             printf("Received %ld %s", len, recvline);
     }
 }
+#endif

@@ -9,11 +9,27 @@
 #include <sys/types.h>
 #include <strings.h>
 #include <errno.h>
+#include <signal.h>
+#include <errno.h>
+#include <sys/wait.h>
 
 #include "myunp.h"
 
 #define SERVPORT 8860
 #define LISTENQ  128
+
+
+void sig_chld(int signo)
+{
+    pid_t pid;
+    int stat;
+
+    while ((pid = waitpid(-1, &stat, WNOHANG)) > 0){
+        printf("child %d terminated\n", pid);
+    }
+
+    return;
+}
 
 
 int main(int argc, char *argv[])
@@ -24,6 +40,9 @@ int main(int argc, char *argv[])
     pid_t childpid;
     socklen_t clilen;
     struct sockaddr_in cliaddr, servaddr;
+
+    signal(SIGCHLD, sig_chld);
+
 
     listenfd = socket(AF_INET, SOCK_STREAM, 0);
     if (listenfd < 0){
@@ -52,8 +71,12 @@ int main(int argc, char *argv[])
         clilen = sizeof(cliaddr);
         connfd = accept(listenfd, (struct sockaddr *)&cliaddr, &clilen);
         if (connfd < 0){
-            perror("accept()");
-            exit(1);
+            if (errno == EINTR ){
+                continue;
+            } else {
+                perror("accept()");
+                exit(1);
+            }
         }
         printf("Accept client: %s at port: %d\n", 
                 inet_ntop(AF_INET, &cliaddr.sin_addr, str, sizeof(str)),

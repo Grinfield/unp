@@ -6,19 +6,30 @@
 #include <string.h>
 #include <unistd.h>
 #include <stdlib.h>
+#include <signal.h>
 
 #include "myunp.h"
 
 #define SERVPORT 8860
 
+
+void sig_pipe(int signo)
+{
+    printf("Caught SIGPIPE\n");
+}
+
+
 int main(int argc, char *argv[])
 {   
     int sockfd, ret;
     struct sockaddr_in servaddr;
+
     if (argc != 2){
-        fprintf(stderr, "usage: ./tcpcli01 <IPADDRESS>");
+        fprintf(stderr, "usage: %s <IPADDRESS>", argv[0]);
         exit(1);
     }
+
+    signal(SIGPIPE, sig_pipe);
 
     sockfd = socket(AF_INET, SOCK_STREAM, 0);
     if (sockfd < 0){

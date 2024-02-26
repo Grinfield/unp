@@ -1,16 +1,13 @@
-CC = gcc
-CFLAGS = -g -O0
-SRC_DIR = $(CURDIR)
+export SRC_DIR = $(CURDIR)
 
+CC = gcc
+export CFLAGS = -g -O0
 CFLAGS += -I$(SRC_DIR)/include
 
-SUBDIR_CFLAGS = -g -O0 
-SUBDIR_CFLAGS += -I$(SRC_DIR)/include
-
-TARGET_DIRS = chapter5
+TARGET_DIRS = chapter5 chapter6
 SUBDIR_RULES = $(patsubst %,subdir-%, $(TARGET_DIRS))
 
-COMMON_OBJS := common/wraps.o
+export COMMON_OBJS := $(SRC_DIR)/common/wraps.o $(SRC_DIR)/common/strcliselect01.o
 LIBS :=
 
 .PHONY: all clean
@@ -23,17 +20,15 @@ endif
 
 %.d: %.c
 	@set -e; rm -f $@; \
-	$(CC) -MM $(SUBDIR_CFLAGS) $< > $@.$$$$; \
-	sed 's,\($*\)\.o[ :]*,\1.o $@ : ,g' < $@.$$$$ > $@; \
+	$(CC) -MM $(CFLAGS) $< > $@.$$$$; \
+	sed 's,\($(*F)\)\.o[ :]*,\1.o $(@F) : ,g' < $@.$$$$ > $@; \
 	rm -f $@.$$$$
 
 %.o: %.c
 	$(CC) $(CFLAGS) -o $@ -c $<
 
-$(COMMON_OBJS):
-
 subdir-%: $(COMMON_OBJS)
-	$(MAKE) -C $* SUBDIR_CFLAGS="$(SUBDIR_CFLAGS)" COMMON_OBJS="$(COMMON_OBJS)" SRC_DIR=$(SRC_DIR) all
+	$(MAKE) -C $* all
 
 clean:
 	-$(RM) common/*.o; \
