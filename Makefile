@@ -4,7 +4,7 @@ CC = gcc
 export CFLAGS = -g -O0
 CFLAGS += -I$(SRC_DIR)/include
 
-TARGET_DIRS = chapter5 chapter6
+TARGET_DIRS = chapter5 chapter6 chapter7
 SUBDIR_RULES = $(patsubst %,subdir-%, $(TARGET_DIRS))
 
 export COMMON_OBJS := $(SRC_DIR)/common/wraps.o $(SRC_DIR)/common/strcliselect01.o
