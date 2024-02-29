@@ -30,6 +30,8 @@ int main(int argc, char *argv[])
     char buf[BUFSIZ];
     int nready;
 
+    int reuseaddr = 1;
+
     char dst_addr[INET_ADDRSTRLEN];
     socklen_t clilen;
     struct sockaddr_in cliaddr, servaddr;
@@ -45,6 +47,10 @@ int main(int argc, char *argv[])
     servaddr.sin_addr.s_addr = htonl(INADDR_ANY);
     servaddr.sin_port = htons(SERVPORT);
 
+    if (setsockopt(listenfd, SOL_SOCKET, SO_REUSEADDR, &reuseaddr, sizeof(reuseaddr)) < 0){
+        perror("setsockopt()");
+        exit(EXIT_FAILURE);
+    }
     ret = bind(listenfd, (struct sockaddr *)&servaddr, sizeof(servaddr));
     if (ret < 0){
         perror("bind()");

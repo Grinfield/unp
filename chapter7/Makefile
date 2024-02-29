@@ -1,10 +1,14 @@
 CC = gcc
 
-SRC = checkopts.c
+SRC = checkopts.c tcpcliopts.c
 OBJ = $(SRC:.c=.o)
 EXEC = $(OBJ:%.o=%)
 
 all: $(EXEC)
+
+ifeq ($(COMMON_OBJS),)
+	$(error 'Variable COMMON_OBJS undefined.')
+endif
 
 ifneq ($(MAKECMDGOALS),clean)
 -include $(OBJ:.o=.d)
@@ -20,7 +24,7 @@ endif
 	$(CC) $(CFLAGS) -o $@ -c $<
 
 $(EXEC): % : %.o
-	$(CC) $(LDFLAGS) -o $@ $< $(LBLIBS)
+	$(CC) $(LDFLAGS) -o $@ $< $(COMMON_OBJS)
 
 clean:
 	-$(RM) *.d; \
