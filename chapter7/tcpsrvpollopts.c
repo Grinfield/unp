@@ -1,4 +1,4 @@
-// tcpsrvpoll.c
+// tcpsrvpollopts.c
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -30,7 +30,7 @@ int main(int argc, char *argv[])
     char buf[BUFSIZ];
     int nready;
 
-    int reuseaddr = 1;
+    int val = 1;
 
     char dst_addr[INET_ADDRSTRLEN];
     socklen_t clilen;
@@ -47,6 +47,11 @@ int main(int argc, char *argv[])
     servaddr.sin_addr.s_addr = htonl(INADDR_ANY);
     servaddr.sin_port = htons(SERVPORT);
 
+    // set SO_REUSEADDR opt
+    if (setsockopt(listenfd, SOL_SOCKET, SO_REUSEADDR, &val, sizeof(val)) < 0){
+        perror("setsockopt()");
+        exit(EXIT_FAILURE);
+    }
     ret = bind(listenfd, (struct sockaddr *)&servaddr, sizeof(servaddr));
     if (ret < 0){
         perror("bind()");
@@ -56,6 +61,11 @@ int main(int argc, char *argv[])
     ret = listen(listenfd, LISTENQ);
     if (ret < 0){
         perror("listen()");
+        exit(EXIT_FAILURE);
+    }
+    // set SO_KEEPALIVE opt
+    if (setsockopt(listenfd, SOL_SOCKET, SO_KEEPALIVE, &val, sizeof(val)) < 0){
+        perror("setsockopt()");
         exit(EXIT_FAILURE);
     }
 

@@ -1,6 +1,6 @@
 CC = gcc
 
-SRC = checkopts.c tcpcliopts.c
+SRC = checkopts.c tcpcliopts.c tcpsrvpollopts.c
 OBJ = $(SRC:.c=.o)
 EXEC = $(OBJ:%.o=%)
 
