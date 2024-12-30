@@ -1,5 +1,4 @@
 # unp
 
-#### 介绍
-UNIX 网络编程的代码实践，作为学习用。
-
+#### Introduction
+This repo is the coding examples of the book *UNIX Network Programming* for the aim of learning.
